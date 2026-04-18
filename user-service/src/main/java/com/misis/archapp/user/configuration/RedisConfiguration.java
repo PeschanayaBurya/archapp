@@ -25,3 +25,7 @@ public class RedisConfiguration {
     }
 
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> f4519b0 (balance service)
