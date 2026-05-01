@@ -1,4 +1,5 @@
 package com.misis.archapp.user.service.publisher;
+
 import com.misis.archapp.contract.dto.UserCreatedEvent;
 import com.misis.archapp.contract.configuration.RabbitConfiguration;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -22,5 +23,5 @@ public class UserEventPublisher {
             event
         );
     }
-
+    
 }

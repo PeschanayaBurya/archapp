@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import com.misis.archapp.contract.dto.UserCreatedEvent;
+import com.misis.archapp.user.service.publisher.UserEventPublisher;
 
 @Service
 public class UserService {
@@ -25,16 +27,19 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final UserCacheService userCacheService;
+    private final UserEventPublisher userEventPublisher;
 
     @Autowired
     public UserService(
         UserRepository userRepository,
         UserMapper userMapper,
-        UserCacheService userCacheService
+        UserCacheService userCacheService,
+        UserEventPublisher userEventPublisher
     ) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.userCacheService = userCacheService;
+        this.userEventPublisher = userEventPublisher;
     }
 
     public List<UserDTO> getAllUsers() {
@@ -64,6 +69,11 @@ public class UserService {
     public UserDTO createUser(UserCreateDTO userCreateDTO) {
         User user = userMapper.toEntity(userCreateDTO);
         User savedUser = userRepository.save(user);
+        
+        // отправляет ивент с данными о пользователе
+        UserCreatedEvent userCreatedEvent = new UserCreatedEvent(user.getId(), user.getEmail(), user.getName());
+        userEventPublisher.publishUserEvent(userCreatedEvent);
+
         return userMapper.toDTO(savedUser);
     }
 

@@ -22,5 +22,5 @@ public class EventConsumerListener {
     public void handleUserEvent(UserCreatedEvent event) {
         notificationService.sendNotification(event);
     }
-
+    
 }
