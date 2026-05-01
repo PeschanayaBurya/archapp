@@ -18,18 +18,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import com.misis.archapp.contract.metrics.Metrics;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 
 @RestController
 @RequestMapping("users")
 public class UserRestApiController {
 
     private final UserService userService;
+    private final MeterRegistry meterRegistry;
 
     @Autowired
     public UserRestApiController(
-        UserService userService
+        UserService userService,
+        MeterRegistry meterRegistry
     ) {
         this.userService = userService;
+        this.meterRegistry = meterRegistry;
     }
 
     @GetMapping
@@ -39,11 +45,15 @@ public class UserRestApiController {
 
     @GetMapping("{id}")
     public UserDTO getUserById(@PathVariable("id") UUID id) {
+        // метрика времени выполнения запроса с тегом GET
+        Timer timer = meterRegistry.timer(Metrics.API_USER_REQ_DURATION, Metrics.METHOD_TAG, Metrics.GET_TAG_VAL);
         return userService.getUserById(id);
     }
 
     @PostMapping
     public UserDTO createUser(@RequestBody @Valid UserCreateDTO userCreateDTO) {
+        // метрика времени выполнения запроса с тегом POST
+        Timer timer = meterRegistry.timer(Metrics.API_USER_REQ_DURATION, Metrics.METHOD_TAG, Metrics.POST_TAG_VAL);
         return userService.createUser(userCreateDTO);
     }
 
